@@ -36,6 +36,10 @@ public class JettraGRPCServer {
                 return;
             }
 
+            String path = exchange.getRequestURI().getPath();
+            String[] parts = path.split("/");
+            String methodName = parts[parts.length - 1];
+
             // Jettra-native gRPC headers
             exchange.getResponseHeaders().set("Content-Type", "application/grpc+jettra");
             exchange.sendResponseHeaders(200, 0);
@@ -46,10 +50,27 @@ public class JettraGRPCServer {
                 // Read Jettra-gRPC frame
                 byte[] requestData = JettraProtocol.readFrame(is);
                 
-                logger.info("JettraGRPC: Handling native frame for " + service.getServiceName());
+                logger.info("JettraGRPC: Handling native frame for " + service.getServiceName() + "::" + methodName);
                 
-                // Dispatch logic would go here in a full implementation
-                byte[] responseData = new byte[0]; 
+                final byte[][] responseWrapper = new byte[1][];
+                
+                service.call(methodName, requestData, new JettraObserver<byte[]>() {
+                    @Override
+                    public void onNext(byte[] value) {
+                        responseWrapper[0] = value;
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        t.printStackTrace();
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                    }
+                });
+                
+                byte[] responseData = responseWrapper[0] != null ? responseWrapper[0] : new byte[0]; 
                 JettraProtocol.writeFrame(os, responseData);
             }
         }
