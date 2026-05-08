@@ -1,0 +1,8 @@
+io/jettra/grpc/JettraGRPCClient.class
+io/jettra/grpc/JettraProtocol.class
+io/jettra/grpc/JettraService.class
+io/jettra/grpc/JettraObserver.class
+io/jettra/grpc/JettraSerializer.class
+io/jettra/grpc/JettraGRPCServer$NativeGRPCHandler$1.class
+io/jettra/grpc/JettraGRPCServer$NativeGRPCHandler.class
+io/jettra/grpc/JettraGRPCServer.class
